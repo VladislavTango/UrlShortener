@@ -1,0 +1,143 @@
+﻿@model URLShortener.Application.Url.Reponse.GetUrlsResponse
+
+<h2>Список сокращенных ссылок</h2>
+
+@if (Model.Urls.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Оригинальная ссылка</th>
+                <th>Сокращенная ссылка</th>
+                <th>Дата создания</th>
+                <th>Количество переходов</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var url in Model.Urls)
+            {
+                <tr>
+                    <td><a href="@url.LongUrl" target="_blank">@url.LongUrl</a></td>
+                    <td><a href="https://localhost:7254/@url.ShortUrl">https://localhost:7254/@url.ShortUrl</a></td>
+                    <td>@url.CreateDate.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@url.RedirectCounter</td>
+                    <td>
+                        <button class="btn btn-primary"
+                                onclick="editUrl(this, '@url.ShortUrl')"
+                                data-longurl="@url.LongUrl">
+                            Редактировать
+                        </button>
+                        <button class="btn btn-danger"
+                                onclick="deleteUrl('@url.ShortUrl')"
+                                data-shorturl="@url.ShortUrl">
+                            Удалить
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        @if (ViewContext.HttpContext.Request.Query.ContainsKey("pageNumber"))
+        {
+            int currentPage = int.Parse(ViewContext.HttpContext.Request.Query["pageNumber"]);
+            int totalPages = (int)Math.Ceiling((double)Model.PageCount / 10);
+
+            <div>
+                @if (currentPage > 1)
+                {
+                    <a href="?pageNumber=@(currentPage - 1)&pageSize=10">« Назад</a>
+                }
+
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    if (i == currentPage)
+                    {
+                        <strong>@i</strong>
+                    }
+                    else
+                    {
+                        <button><a href="?pageNumber=@i&pageSize=10">@i</a></button>
+                    }
+                }
+
+                @if (currentPage < totalPages)
+                {
+                    <a href="?pageNumber=@(currentPage + 1)&pageSize=10">Вперёд »</a>
+                }
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>Нет данных</p>
+}
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Редактировать ссылку</h5>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <div class="form-group">
+                        <label for="longUrl">Оригинальная ссылка</label>
+                        <input type="url" class="form-control" id="longUrl" name="longUrl" required>
+                    </div>
+                    <input type="hidden" id="shortUrl" name="shortUrl">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="submitEdit()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+     function editUrl(button, shortUrl) {
+        const longUrl = button.getAttribute('data-longurl');
+        document.getElementById('longUrl').value = longUrl;
+        document.getElementById('shortUrl').value = shortUrl;
+        $('#editModal').modal('show');
+    }
+
+    function submitEdit() {
+          const updateRequest = {
+          LongUrl: document.getElementById("longUrl").value,
+          ShortUrl: document.getElementById("shortUrl").value
+          };
+
+
+          fetch('https://localhost:7254/update', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateRequest)
+      })
+        .then(response => {
+            window.location.reload();
+        })
+
+    }
+
+       function deleteUrl(shortUrl) {
+      if (confirm('Вы уверены, что хотите удалить эту ссылку?')) {
+        fetch('https://localhost:7254/delete', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ shorUrl: shortUrl })
+        })
+        .then(result => {
+          window.location.reload();
+        })
+      }
+    }
+
+</script>

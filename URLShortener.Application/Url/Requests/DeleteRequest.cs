@@ -2,8 +2,8 @@
 
 namespace URLShortener.Application.Url.Requests
 {
-    public class DeleteRequest : IRequest<int>
+    public class DeleteRequest : IRequest<string>
     {
-        public int Id { get; set; }
+        public string shorUrl { get; set; }
     }
 }

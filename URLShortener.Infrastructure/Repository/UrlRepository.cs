@@ -9,10 +9,12 @@ namespace URLShortener.Infrastructure.Repository
     public class UrlRepository : IUrlRepository
     {
         private readonly ISession _session;
+        private readonly ISessionFactory _sessionFactory;
 
-        public UrlRepository(ISession session)
+        public UrlRepository(ISession session, ISessionFactory sessionFactory)
         {
             _session = session;
+            _sessionFactory = sessionFactory;
         }
 
         public async Task<string> AddUrl(string longUrl, string shortUrl)
@@ -32,17 +34,26 @@ namespace URLShortener.Infrastructure.Repository
             return shortUrl;
         }
 
-        public async Task<int> DeleteUrl(int id)
+        public async Task<string> DeleteUrl(string url)
         {
-            using var transaction = _session.BeginTransaction();
+            using (var session = _sessionFactory.OpenSession())
+            {
+                var urlEntity = session.QueryOver<UrlEntity>()
+                                       .Where(u => u.ShortUrl == url)
+                                       .SingleOrDefault();
 
-            var entity = GetById(id);
-
-            await _session.DeleteAsync(entity); 
-            await transaction.CommitAsync(); 
-
-            return id;
+                if (urlEntity != null)
+                {
+                    using (var transaction = session.BeginTransaction())
+                    {
+                        session.Delete(urlEntity);
+                        transaction.Commit();
+                    }
+                }
+            }
+            return url;
         }
+
 
         public async Task<UrlEntity> GetByLongUrl(string longUrl)
         {
@@ -84,13 +95,15 @@ namespace URLShortener.Infrastructure.Repository
 
         public async Task UpdateUrl(UrlEntity urlEntity)
         {
-            using var transaction = _session.BeginTransaction();
-            var entity = await GetById(urlEntity.Id);
-            entity = urlEntity; 
+            using (var session = _sessionFactory.OpenSession())
+            using (var transaction = session.BeginTransaction())
+            {
+                session.SaveOrUpdate(urlEntity);
+                transaction.Commit();
 
-            await _session.UpdateAsync(entity); 
-            await transaction.CommitAsync(); 
+            }
         }
+
 
         public async Task<UrlEntity> GetByShortUrl(string shortUrl)
         {

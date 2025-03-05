@@ -18,35 +18,14 @@ namespace URLShortener.Controllers
         public async Task<IActionResult> AddUrl(AddUrlRequest request)
         {
             var responce = await Mediator.Send(request);
-            return View("AddUrl" ,responce);
+
+            return View("AddUrl", responce);
         }
         [HttpGet]
-        public IActionResult GetUrls(GetUrlsRequest request)
-        {
-            var responce = Mediator.Send(request);
-            return View(responce);
-        }
-        [HttpPut]
-        public IActionResult UpdateUrl(UpdateUrlRequest request)
-        {
-            var responce = Mediator.Send(request);
-            return View(responce);
-        }
-        [HttpDelete]
-        public IActionResult UpdateUrl(DeleteRequest request)
-        {
-            var responce = Mediator.Send(request);
-            return View(responce);
-        }
-        public async Task<IActionResult> Redirect(RedirectRequest request)
+        public async Task<IActionResult> GetUrls(GetUrlsRequest request)
         {
             var responce = await Mediator.Send(request);
-            return Redirect(responce);
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
+            return View(responce);
         }
     }
 }

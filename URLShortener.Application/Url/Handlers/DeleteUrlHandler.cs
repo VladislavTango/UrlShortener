@@ -4,7 +4,7 @@ using URLShortener.Domain.Interfaces;
 
 namespace URLShortener.Application.Url.Handlers
 {
-    public class DeleteUrlHandler : IRequestHandler<DeleteRequest, int>
+    public class DeleteUrlHandler : IRequestHandler<DeleteRequest, string>
     {
         private readonly IUrlRepository _urlRepository;
 
@@ -13,12 +13,12 @@ namespace URLShortener.Application.Url.Handlers
             _urlRepository = urlRepository;
         }
 
-        public async Task<int> Handle(DeleteRequest request, CancellationToken cancellationToken)
+        public async Task<string> Handle(DeleteRequest request, CancellationToken cancellationToken)
         {
-            if (_urlRepository.GetById(request.Id) != null)
+            if (_urlRepository.GetByShortUrl(request.shorUrl) != null)
               throw new Exception("Нет такой записи");
 
-            return await _urlRepository.DeleteUrl(request.Id);
+            return await _urlRepository.DeleteUrl(request.shorUrl);
 
         }
     }

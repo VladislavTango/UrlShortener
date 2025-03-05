@@ -23,7 +23,7 @@ namespace URLShortener.Infrastructure.AppContext
                 db.Driver<MySqlConnectorDriver>();
                 db.LogSqlInConsole = true;
                 db.LogFormattedSql = true;
-                db.SchemaAction = SchemaAutoAction.Update;
+                db.SchemaAction = SchemaAutoAction.Validate;
             });
 
             var mapper = new ModelMapper();
@@ -31,11 +31,12 @@ namespace URLShortener.Infrastructure.AppContext
             var mapping = mapper.CompileMappingForAllExplicitlyAddedEntities();
             configuration.AddMapping(mapping);
 
-            var schemaExport = new SchemaExport(configuration);
-            schemaExport.Create(false, true); 
+            var schemaUpdate = new SchemaUpdate(configuration);
+            schemaUpdate.Execute(false, true);
 
             return configuration.BuildSessionFactory();
         }
+
 
         private static void CreateDatabaseIfNotExists(string connectionString)
         {

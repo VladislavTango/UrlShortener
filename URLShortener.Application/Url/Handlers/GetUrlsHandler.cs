@@ -22,6 +22,7 @@ namespace URLShortener.Application.Url.Handlers
                 Urls = list,
                 PageCount = await _urlRepository.GetLen(),
             };
+
             return response;
         }
     }

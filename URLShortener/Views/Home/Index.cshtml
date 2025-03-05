@@ -8,5 +8,15 @@
     <form method="post" asp-action="AddUrl">
         <input type="text" name="Url" placeholder="Введите URL" required />
         <button type="submit">Сократить ссылку</button>
-    </form>
+    </form >
+    <br />
+    <li class="nav-item">
+        <a class="nav-link text-dark"
+           asp-area=""
+           asp-controller="Home"
+           asp-action="GetUrls"
+           asp-all-route-data="@(new Dictionary<string, string> { { "PageSize", "10" }, { "PageNumber", "1" } })">
+            Посмотреть другие сокращенные ссылки
+        </a>
+    </li>
 </div>

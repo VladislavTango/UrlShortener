@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using System;
+using System.Text.RegularExpressions;
 using URLShortener.Application.Url.Requests;
 using URLShortener.Domain.Interfaces;
 
@@ -16,7 +16,11 @@ namespace URLShortener.Application.Url.Handlers
 
         public async Task<string> Handle(AddUrlRequest request, CancellationToken cancellationToken)
         {
-            if (!Uri.IsWellFormedUriString(request.Url, UriKind.RelativeOrAbsolute))
+
+            string pattern = @"^(https?:\/\/)?([а-я0-9_-]{1,32}|[a-z0-9_-]{1,32})\.([а-я0-9_-]{1,8}|[a-z0-9_-]\S{1,8})$";
+            Regex regex = new Regex(pattern, RegexOptions.IgnoreCase);
+
+            if (!regex.IsMatch(request.Url))
                 throw new Exception("Это не ссылка");
 
             var responce = await urlRepository.GetByLongUrl(request.Url);
