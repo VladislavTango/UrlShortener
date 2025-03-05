@@ -15,10 +15,10 @@ namespace URLShortener.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult AddUrl(AddUrlRequest request)
+        public async Task<IActionResult> AddUrl(AddUrlRequest request)
         {
-            var responce = Mediator.Send(request);
-            return View(responce);
+            var responce = await Mediator.Send(request);
+            return View("AddUrl" ,responce);
         }
         [HttpGet]
         public IActionResult GetUrls(GetUrlsRequest request)

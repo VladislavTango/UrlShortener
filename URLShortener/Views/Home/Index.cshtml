@@ -2,7 +2,11 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="align-content-center text-center">
+    <h1 class="display-4">Сокращение ссылок</h1>
+
+    <form method="post" asp-action="AddUrl">
+        <input type="text" name="Url" placeholder="Введите URL" required />
+        <button type="submit">Сократить ссылку</button>
+    </form>
 </div>
